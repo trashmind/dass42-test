@@ -1,0 +1,48 @@
+/* Gaya untuk transisi tinggi container soal agar animasi mulus */
+#questionsContainer {
+    transition: height 0.3s ease-in-out;
+}
+
+/* Menyembunyikan tombol radio asli */
+.option-input {
+    display: none;
+}
+
+/* Gaya untuk label pilihan jawaban yang bisa diklik */
+.option-label {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db; /* gray-300 */
+    border-radius: 0.5rem; /* rounded-lg */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background-color: #f9fafb; /* gray-50 */
+    text-align: left;
+}
+
+/* Efek saat kursor mouse di atas pilihan */
+.option-label:hover {
+    border-color: #10b981; /* green-500 */
+    background-color: #ecfdf5; /* green-50 */
+}
+
+/* Gaya untuk pilihan yang sedang dipilih */
+.option-input:checked + .option-label {
+    border-color: #059669; /* green-600 */
+    background-color: #d1fae5; /* green-200 */
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.5); /* ring-2 ring-green-400 */
+    font-weight: 600;
+    color: #065f46; /* green-800 */
+}
+
+/* ========================================================== */
+/* Gaya untuk Box Gradasi (Ditambahkan/Diperbarui) */
+/* ========================================================== */
+.gradient-box {
+    background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.9), rgba(220, 252, 231, 0.7)); /* Gradasi Putih ke Hijau Muda */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Sedikit border transparan */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08); /* Shadow yang lebih halus */
+}
