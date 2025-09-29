@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const questionsContainer = document.getElementById('questionsContainer');
     const questionCounter = document.getElementById('questionCounter');
     const questionMapContainer = document.getElementById('questionMapContainer');
+    const endpage = document.getElementById('endpage');
     
     let exportData = [];
     let currentQuestionIndex = 0;
@@ -81,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                                 <div>
                                     <input type="radio" id="q${questionNumber}-${value}" name="q${questionNumber}" value="${value}" class="option-input">
                                     <label for="q${questionNumber}-${value}" class="option-label text-gray-700">
-                                        <span class="font-bold mr-2 text-green-700">${value}</span> - ${text}
+                                    ${text}
                                     </label>
                                 </div>
                             `).join('')}
@@ -155,6 +156,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     openNowButton.addEventListener('click', () => {
         landingPageStep.classList.add('hidden');
         dataDiriStep.classList.remove('hidden');
+        document.body.style.backgroundImage = "url('./asset/3background.svg')";
+        document.getElementById("icon-person").classList.remove("md:block");
     });
 
     closeModalButton.addEventListener('click', () => alertModal.classList.add('hidden'));
@@ -261,15 +264,16 @@ document.addEventListener('DOMContentLoaded', async function() {
             S: getStressLevel(finalScores.S)
         };
 
-        document.getElementById('depressionScore').textContent = finalScores.D;
-        document.getElementById('depressionLevel').textContent = levels.D;
-        document.getElementById('anxietyScore').textContent = finalScores.A;
-        document.getElementById('anxietyLevel').textContent = levels.A;
-        document.getElementById('stressScore').textContent = finalScores.S;
-        document.getElementById('stressLevel').textContent = levels.S;
+        // document.getElementById('depressionScore').textContent = finalScores.D;
+        // document.getElementById('depressionLevel').textContent = levels.D;
+        // document.getElementById('anxietyScore').textContent = finalScores.A;
+        // document.getElementById('anxietyLevel').textContent = levels.A;
+        // document.getElementById('stressScore').textContent = finalScores.S;
+        // document.getElementById('stressLevel').textContent = levels.S;
 
         kuesionerStep.classList.add('hidden');
-        resultsDiv.classList.remove('hidden');
+        // resultsDiv.classList.remove('hidden');
+        endpage.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         
         exportData = [{
