@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const questionBlock = `
                 <div class="question-block absolute w-full transition-opacity duration-300 ease-in-out" data-index="${index}">
                     <div class="p-4 sm:p-6 rounded-lg bg-white/50">
-                        <p class="font-semibold text-lg text-gray-800 mb-5">${questionNumber}. ${q.text}</p>
+                        <p class="font-semibold text-lg text-gray-800 mb-5">${q.text}</p>
                         <div class="space-y-3">
                             ${[{ value: 0, text: 'Tidak Pernah' }, { value: 1, text: 'Kadang-kadang' }, { value: 2, text: 'Sering' }, { value: 3, text: 'Hampir Selalu' }].map(({ value, text }) => `
                                 <div>
@@ -97,6 +97,19 @@ document.addEventListener('DOMContentLoaded', async function() {
                         </div>
                     </div>
                 </div>`;
+            // const questionBlock = `
+            //     <div class="question-block absolute w-full transition-opacity duration-300 ease-in-out" data-index="${index}">
+            //         <div class="p-4 sm:p-6 rounded-lg bg-white/50">
+            //             <p class="font-semibold text-lg text-gray-800 mb-5">${questionNumber}. ${q.text}</p>
+            //             <div class="space-y-3">
+            //                 ${[{ value: 0, text: 'Tidak Pernah' }, { value: 1, text: 'Kadang-kadang' }, { value: 2, text: 'Sering' }, { value: 3, text: 'Hampir Selalu' }].map(({ value, text }) => `
+            //                     <div>
+            //                         <input type="radio" id="q${questionNumber}-${value}" name="q${questionNumber}" value="${value}" class="option-input">
+            //                         <label for="q${questionNumber}-${value}" class="option-label text-gray-700">${text}</label>
+            //                     </div>`).join('')}
+            //             </div>
+            //         </div>
+            //     </div>`;
             questionsContainer.innerHTML += questionBlock;
 
             const mapItem = document.createElement('button');
@@ -296,18 +309,18 @@ document.addEventListener('DOMContentLoaded', async function() {
         endpage.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         
-        exportData = [{
-            'Nama Karyawan': formData.get('employeeName'), 
-            'ID Karyawan': formData.get('employeeId'), 
-            'Departemen': formData.get('department'),
-            'Unit': formData.get('unit'),
-            'Tingkat': formData.get('tingkat'),
-            'Usia': formData.get('age'),
-            'Skor Depresi': finalScores.D, 'Tingkat Depresi': levels.D,
-            'Skor Kecemasan': finalScores.A, 'Tingkat Kecemasan': levels.A,
-            'Skor Stres': finalScores.S, 'Tingkat Stres': levels.S,
-            'Tanggal': new Date().toLocaleDateString('id-ID')
-        }];
+        // exportData = [{
+        //     'Nama Karyawan': formData.get('employeeName'), 
+        //     'ID Karyawan': formData.get('employeeId'), 
+        //     'Departemen': formData.get('department'),
+        //     'Unit': formData.get('unit'),
+        //     'Tingkat': formData.get('tingkat'),
+        //     'Usia': formData.get('age'),
+        //     'Skor Depresi': finalScores.D, 'Tingkat Depresi': levels.D,
+        //     'Skor Kecemasan': finalScores.A, 'Tingkat Kecemasan': levels.A,
+        //     'Skor Stres': finalScores.S, 'Tingkat Stres': levels.S,
+        //     'Tanggal': new Date().toLocaleDateString('id-ID')
+        // }];
         
         // Menambahkan tombol export di halaman akhir
         // const exportButtonEndPage = document.createElement('button');
