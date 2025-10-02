@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // ---- BAGIAN UTAMA DENGAN LINK BARU ----
     async function initializeApp() {
         // --- GANTI LINK DI BAWAH INI ---
-        const googleSheetQuestionsURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRA1o8wzpNdcfFZSBKxbkToTBjvDvHfCJ58hXMCO_aEAOeYjfGGXf7tfkDxwIL4qzoFqGgDSeAkcPvR/pub?gid=1682628887&single=true&output=csv';
+        const googleSheetQuestionsURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRA1o8wzpNdcfFZSBKxbkToTBjvDvHfCJ58hXMCO_aEAOeYjfGGXf7tfkDxwIL4qzoFqGgDSeAkcPvR/pub?gid=163045373&single=true&output=csv';
         const googleSheetBagianURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBK0QHLv0BTPBgyeJ9Wg3yCU6M55mA3PLJVOHe2pq8vSe_sHfPjZTssF6lTgWiyAgDqwU7Ywjzwyat/pub?gid=0&single=true&output=csv';
         const googleSheetUnitURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBK0QHLv0BTPBgyeJ9Wg3yCU6M55mA3PLJVOHe2pq8vSe_sHfPjZTssF6lTgWiyAgDqwU7Ywjzwyat/pub?gid=1872872817&single=true&output=csv';
         const googleSheetTingkatURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBK0QHLv0BTPBgyeJ9Wg3yCU6M55mA3PLJVOHe2pq8vSe_sHfPjZTssF6lTgWiyAgDqwU7Ywjzwyat/pub?gid=567835733&single=true&output=csv';
@@ -264,81 +264,168 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 
+    // dassForm.addEventListener('submit', function(e) {
+    //     e.preventDefault();
+        
+    //     const formData = new FormData(dassForm);
+        
+    //     let unansweredQuestions = [];
+    //     for (let i = 1; i <= questions.length; i++) {
+    //         if (!formData.has(`q${i}`)) {
+    //             unansweredQuestions.push(i);
+    //         }
+    //     }
+
+    //     if (unansweredQuestions.length > 0) {
+    //         alertMessage.textContent = 'Harap jawab semua pertanyaan. Pertanyaan berikut belum dijawab:';
+    //         unansweredList.innerHTML = '';
+    //         unansweredQuestions.forEach(qNum => {
+    //             const li = document.createElement('li');
+    //             li.textContent = `Nomor ${qNum}`;
+    //             unansweredList.appendChild(li);
+    //         });
+    //         alertModal.classList.remove('hidden');
+    //         return;
+    //     }
+
+    //     let scores = { D: 0, A: 0, S: 0 };
+    //     for (let i = 0; i < questions.length; i++) {
+    //         const questionNumber = i + 1;
+    //         const type = questions[i].type;
+    //         const value = parseInt(formData.get(`q${questionNumber}`), 10);
+    //         if (scores[type] !== undefined) {
+    //             scores[type] += value;
+    //         }
+    //     }
+
+    //     const finalScores = { D: scores.D, A: scores.A, S: scores.S };
+    //     const levels = {
+    //         D: getDepressionLevel(finalScores.D),
+    //         A: getAnxietyLevel(finalScores.A),
+    //         S: getStressLevel(finalScores.S)
+    //     };
+
+    //     kuesionerStep.classList.add('hidden');
+    //     endpage.classList.remove('hidden');
+    //     window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+    //     // exportData = [{
+    //     //     'Nama Karyawan': formData.get('employeeName'), 
+    //     //     'ID Karyawan': formData.get('employeeId'), 
+    //     //     'Departemen': formData.get('department'),
+    //     //     'Unit': formData.get('unit'),
+    //     //     'Tingkat': formData.get('tingkat'),
+    //     //     'Usia': formData.get('age'),
+    //     //     'Skor Depresi': finalScores.D, 'Tingkat Depresi': levels.D,
+    //     //     'Skor Kecemasan': finalScores.A, 'Tingkat Kecemasan': levels.A,
+    //     //     'Skor Stres': finalScores.S, 'Tingkat Stres': levels.S,
+    //     //     'Tanggal': new Date().toLocaleDateString('id-ID')
+    //     // }];
+        
+    //     // Menambahkan tombol export di halaman akhir
+    //     // const exportButtonEndPage = document.createElement('button');
+    //     // exportButtonEndPage.id = 'exportButton';
+    //     // exportButtonEndPage.textContent = 'Export ke Excel';
+    //     // exportButtonEndPage.className = 'bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-transform transform hover:scale-105 mt-8';
+        
+    //     // exportButtonEndPage.addEventListener('click', function() {
+    //     //     if(exportData.length === 0) return;
+    //     //     const worksheet = XLSX.utils.json_to_sheet(exportData);
+    //     //     const workbook = XLSX.utils.book_new();
+    //     //     XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil DASS");
+    //     //     const employeeName = exportData[0]['Nama Karyawan'].replace(/\s+/g, '_');
+    //     //     const today = new Date().toISOString().slice(0, 10);
+    //     //     XLSX.writeFile(workbook, `Hasil_DASS42_${employeeName}_${today}.xlsx`);
+    //     // });
+        
+    //     endpage.querySelector('.w-full.md\\:w-2\\/3.z-20').appendChild(exportButtonEndPage);
+    // });
+
     dassForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(dassForm);
-        
-        let unansweredQuestions = [];
-        for (let i = 1; i <= questions.length; i++) {
-            if (!formData.has(`q${i}`)) {
-                unansweredQuestions.push(i);
+    e.preventDefault();
+    
+    const formData = new FormData(dassForm);
+    
+    let unansweredQuestions = [];
+    for (let i = 1; i <= questions.length; i++) {
+        if (!formData.has(`q${i}`)) {
+            unansweredQuestions.push(i);
+        }
+    }
+
+    if (unansweredQuestions.length > 0) {
+        alertMessage.textContent = 'Harap jawab semua pertanyaan. Pertanyaan berikut belum dijawab:';
+        unansweredList.innerHTML = '';
+        unansweredQuestions.forEach(qNum => {
+            const li = document.createElement('li');
+            li.textContent = `Nomor ${qNum}`;
+            unansweredList.appendChild(li);
+        });
+        alertModal.classList.remove('hidden');
+        return;
+    }
+
+    let scores = { D: 0, A: 0, S: 0 };
+    for (let i = 0; i < questions.length; i++) {
+        const questionNumber = i + 1;
+        const type = questions[i].type;
+        const value = parseInt(formData.get(`q${questionNumber}`), 10);
+        if (scores[type] !== undefined) {
+            scores[type] += value;
+        }
+    }
+
+    const finalScores = { D: scores.D, A: scores.A, S: scores.S };
+    const levels = {
+        D: getDepressionLevel(finalScores.D),
+        A: getAnxietyLevel(finalScores.A),
+        S: getStressLevel(finalScores.S)
+    };
+
+    // --- MULAI MODIFIKASI: Mengirim data ke Google Spreadsheet ---
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyxQ6qvP7HUNsCUdvJoiZj7Km5niMJVagB23TVMz3voJdjCeTrzjwT8VDST01wxGllu/exec';
+    
+    // Membuat objek URLSearchParams untuk membangun query string
+    const params = new URLSearchParams({
+        action: 'dass',
+        namaKaryawan: formData.get('employeeName'),
+        nikSAP: formData.get('employeeId'),
+        bagian: formData.get('department'),
+        usia: formData.get('age'),
+        unit: formData.get('unit'),
+        tingkat: formData.get('tingkat'),
+        skorD: finalScores.D,
+        tingkatD: levels.D,
+        skorC: finalScores.A, // 'A' untuk Anxiety (Kecemasan)
+        tingkatC: levels.A,
+        skorS: finalScores.S,
+        tingkatS: levels.S
+    });
+
+    // Mengirim data menggunakan Fetch API (metode GET)
+    fetch(`${scriptURL}?${params.toString()}`)
+        .then(response => {
+            if (response.ok) {
+                console.log('Data berhasil terkirim ke Spreadsheet.');
+            } else {
+                // Jika terjadi error dari sisi server (misal: script error)
+                console.error('Gagal mengirim data. Status:', response.status);
             }
-        }
+        })
+        .catch(error => {
+            // Jika terjadi error jaringan (misal: tidak ada internet)
+            console.error('Error saat mengirim data:', error.message);
+            alert('Terjadi kesalahan jaringan. Gagal mengirim data ke server.');
+        });
+    // --- AKHIR MODIFIKASI ---
 
-        if (unansweredQuestions.length > 0) {
-            alertMessage.textContent = 'Harap jawab semua pertanyaan. Pertanyaan berikut belum dijawab:';
-            unansweredList.innerHTML = '';
-            unansweredQuestions.forEach(qNum => {
-                const li = document.createElement('li');
-                li.textContent = `Nomor ${qNum}`;
-                unansweredList.appendChild(li);
-            });
-            alertModal.classList.remove('hidden');
-            return;
-        }
-
-        let scores = { D: 0, A: 0, S: 0 };
-        for (let i = 0; i < questions.length; i++) {
-            const questionNumber = i + 1;
-            const type = questions[i].type;
-            const value = parseInt(formData.get(`q${questionNumber}`), 10);
-            if (scores[type] !== undefined) {
-                scores[type] += value;
-            }
-        }
-
-        const finalScores = { D: scores.D, A: scores.A, S: scores.S };
-        const levels = {
-            D: getDepressionLevel(finalScores.D),
-            A: getAnxietyLevel(finalScores.A),
-            S: getStressLevel(finalScores.S)
-        };
-
-        kuesionerStep.classList.add('hidden');
-        endpage.classList.remove('hidden');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-        // exportData = [{
-        //     'Nama Karyawan': formData.get('employeeName'), 
-        //     'ID Karyawan': formData.get('employeeId'), 
-        //     'Departemen': formData.get('department'),
-        //     'Unit': formData.get('unit'),
-        //     'Tingkat': formData.get('tingkat'),
-        //     'Usia': formData.get('age'),
-        //     'Skor Depresi': finalScores.D, 'Tingkat Depresi': levels.D,
-        //     'Skor Kecemasan': finalScores.A, 'Tingkat Kecemasan': levels.A,
-        //     'Skor Stres': finalScores.S, 'Tingkat Stres': levels.S,
-        //     'Tanggal': new Date().toLocaleDateString('id-ID')
-        // }];
-        
-        // Menambahkan tombol export di halaman akhir
-        // const exportButtonEndPage = document.createElement('button');
-        // exportButtonEndPage.id = 'exportButton';
-        // exportButtonEndPage.textContent = 'Export ke Excel';
-        // exportButtonEndPage.className = 'bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-transform transform hover:scale-105 mt-8';
-        
-        // exportButtonEndPage.addEventListener('click', function() {
-        //     if(exportData.length === 0) return;
-        //     const worksheet = XLSX.utils.json_to_sheet(exportData);
-        //     const workbook = XLSX.utils.book_new();
-        //     XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil DASS");
-        //     const employeeName = exportData[0]['Nama Karyawan'].replace(/\s+/g, '_');
-        //     const today = new Date().toISOString().slice(0, 10);
-        //     XLSX.writeFile(workbook, `Hasil_DASS42_${employeeName}_${today}.xlsx`);
-        // });
-        
-        endpage.querySelector('.w-full.md\\:w-2\\/3.z-20').appendChild(exportButtonEndPage);
+    kuesionerStep.classList.add('hidden');
+    endpage.classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Bagian kode untuk export ke Excel tidak diubah dan tetap dalam komentar
+    // exportData = [...]
+    // endpage.querySelector(...).appendChild(exportButtonEndPage);
     });
 
     function getDepressionLevel(score) {
