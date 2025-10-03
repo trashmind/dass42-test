@@ -18,14 +18,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     const questionsContainer = document.getElementById('questionsContainer');
     const questionMapContainer = document.getElementById('questionMapContainer');
     const endpage = document.getElementById('endpage');
-<<<<<<< HEAD
-=======
 
     // ---- VARIABEL BARU UNTUK DROPDOWN ----
     const departmentSelect = document.getElementById('department');
     const unitSelect = document.getElementById('unit');
     const tingkatSelect = document.getElementById('tingkat');
->>>>>>> 95113e74886addb81b54dbd219ba3d2d4a4c1f5e
     
     let exportData = [];
     let currentQuestionIndex = 0;
@@ -95,16 +92,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                             ${[{ value: 0, text: 'Tidak Pernah' }, { value: 1, text: 'Kadang-kadang' }, { value: 2, text: 'Sering' }, { value: 3, text: 'Hampir Selalu' }].map(({ value, text }) => `
                                 <div>
                                     <input type="radio" id="q${questionNumber}-${value}" name="q${questionNumber}" value="${value}" class="option-input">
-<<<<<<< HEAD
-                                    <label for="q${questionNumber}-${value}" class="option-label text-gray-700">
-                                    ${text}
-                                    </label>
-                                </div>
-                            `).join('')}
-=======
                                     <label for="q${questionNumber}-${value}" class="option-label text-gray-700">${text}</label>
                                 </div>`).join('')}
->>>>>>> 95113e74886addb81b54dbd219ba3d2d4a4c1f5e
                         </div>
                     </div>
                 </div>`;
@@ -391,34 +380,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         S: getStressLevel(finalScores.S)
     };
 
-<<<<<<< HEAD
-        const finalScores = { D: scores.D, A: scores.A, S: scores.S };
-        const levels = {
-            D: getDepressionLevel(finalScores.D),
-            A: getAnxietyLevel(finalScores.A),
-            S: getStressLevel(finalScores.S)
-        };
-
-        // document.getElementById('depressionScore').textContent = finalScores.D;
-        // document.getElementById('depressionLevel').textContent = levels.D;
-        // document.getElementById('anxietyScore').textContent = finalScores.A;
-        // document.getElementById('anxietyLevel').textContent = levels.A;
-        // document.getElementById('stressScore').textContent = finalScores.S;
-        // document.getElementById('stressLevel').textContent = levels.S;
-
-        kuesionerStep.classList.add('hidden');
-        // resultsDiv.classList.remove('hidden');
-        endpage.classList.remove('hidden');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-        exportData = [{
-            'Nama Karyawan': employeeName, 'ID Karyawan': employeeId, 'Departemen': department, 'Usia': age,
-            'Skor Depresi': finalScores.D, 'Tingkat Depresi': levels.D,
-            'Skor Kecemasan': finalScores.A, 'Tingkat Kecemasan': levels.A,
-            'Skor Stres': finalScores.S, 'Tingkat Stres': levels.S,
-            'Tanggal': new Date().toLocaleDateString('id-ID')
-        }];
-=======
     // --- MULAI MODIFIKASI: Mengirim data ke Google Spreadsheet ---
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyxQ6qvP7HUNsCUdvJoiZj7Km5niMJVagB23TVMz3voJdjCeTrzjwT8VDST01wxGllu/exec';
     
@@ -437,7 +398,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         tingkatC: levels.A,
         skorS: finalScores.S,
         tingkatS: levels.S
->>>>>>> 95113e74886addb81b54dbd219ba3d2d4a4c1f5e
     });
 
     // Mengirim data menggunakan Fetch API (metode GET)
