@@ -244,9 +244,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             if (currentQuestionIndex < questions.length - 1) {
                 currentQuestionIndex++;
                 showQuestion(currentQuestionIndex);
-            } else {
-                 submitButton.classList.add('animate-pulse');
-            }
+            } 
         }, 300);
     });
 
