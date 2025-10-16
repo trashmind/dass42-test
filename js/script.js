@@ -19,18 +19,35 @@ document.addEventListener('DOMContentLoaded', async function() {
     const questionMapContainer = document.getElementById('questionMapContainer');
     const endpage = document.getElementById('endpage');
 
-    // ---- VARIABEL BARU UNTUK DROPDOWN ----
+    // ---- VARIABEL BARU UNTUK PEMILIHAN TES ----
+    const testSelectionStep = document.getElementById('testSelectionStep');
+    const dass42Button = document.getElementById('dass42Button');
+    const dass21Button = document.getElementById('dass21Button');
+    let selectedTestType = 'DASS-42';
+
+    // ---- VARIABEL LAMA UNTUK DROPDOWN ----
     const departmentSelect = document.getElementById('department');
     const unitSelect = document.getElementById('unit');
     const tingkatSelect = document.getElementById('tingkat');
     
-    let exportData = [];
     let currentQuestionIndex = 0;
     let questionElements = [];
     let mapItemElements = [];
     let questions = [];
+    let allQuestions = []; // Simpan semua 42 soal di sini
 
-    // ---- FUNGSI BARU: Mengambil data untuk dropdown ----
+    // ---- FUNGSI PENYIMPANAN localStorage (DIPERBARUI) ----
+    const saveData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+    const loadData = (key) => JSON.parse(localStorage.getItem(key));
+    const clearData = () => {
+        localStorage.removeItem('dass-step');
+        localStorage.removeItem('dass-answers');
+        localStorage.removeItem('dass-user-data');
+        localStorage.removeItem('dass-current-index');
+        localStorage.removeItem('dass-test-type');
+    };
+
+    // ... (Fungsi fetchDropdownData dan populateDropdown tetap sama) ...
     async function fetchDropdownData(url) {
         try {
             const response = await fetch(url);
@@ -38,18 +55,15 @@ document.addEventListener('DOMContentLoaded', async function() {
                 throw new Error('Gagal mengambil data dropdown dari jaringan.');
             }
             const csvText = await response.text();
-            // Mengubah CSV (satu kolom) menjadi array
             return csvText.trim().split('\n').filter(item => item);
         } catch (error) {
             console.error('Error saat mengambil data dropdown:', error);
-            return []; // Kembalikan array kosong jika gagal
+            return [];
         }
     }
-
-    // ---- FUNGSI BARU: Mengisi dropdown dengan data ----
     function populateDropdown(selectElement, data, defaultText) {
         if (!selectElement) return;
-        selectElement.innerHTML = `<option value="">${defaultText}</option>`; // Reset
+        selectElement.innerHTML = `<option value="">${defaultText}</option>`;
         data.forEach(item => {
             const option = document.createElement('option');
             option.value = item;
@@ -58,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
-    // ---- FUNGSI PARSING CSV UNTUK SOAL (DIPERBARUI) ----
+    // ---- FUNGSI PARSING CSV UNTUK SOAL ----
     async function fetchQuestionsFromSheet(url) {
         try {
             const response = await fetch(url);
@@ -79,8 +93,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // ---- FUNGSI INISIALISASI KUIS (TETAP SAMA) ----
+    // ---- FUNGSI INISIALISASI KUIS ----
     function initializeQuiz() {
+        questionsContainer.innerHTML = '';
+        questionMapContainer.innerHTML = '';
+
         if (questions.length === 0) return;
         questions.forEach((q, index) => {
             const questionNumber = index + 1;
@@ -97,19 +114,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                         </div>
                     </div>
                 </div>`;
-            // const questionBlock = `
-            //     <div class="question-block absolute w-full transition-opacity duration-300 ease-in-out" data-index="${index}">
-            //         <div class="p-4 sm:p-6 rounded-lg bg-white/50">
-            //             <p class="font-semibold text-lg text-gray-800 mb-5">${questionNumber}. ${q.text}</p>
-            //             <div class="space-y-3">
-            //                 ${[{ value: 0, text: 'Tidak Pernah' }, { value: 1, text: 'Kadang-kadang' }, { value: 2, text: 'Sering' }, { value: 3, text: 'Hampir Selalu' }].map(({ value, text }) => `
-            //                     <div>
-            //                         <input type="radio" id="q${questionNumber}-${value}" name="q${questionNumber}" value="${value}" class="option-input">
-            //                         <label for="q${questionNumber}-${value}" class="option-label text-gray-700">${text}</label>
-            //                     </div>`).join('')}
-            //             </div>
-            //         </div>
-            //     </div>`;
             questionsContainer.innerHTML += questionBlock;
 
             const mapItem = document.createElement('button');
@@ -121,10 +125,78 @@ document.addEventListener('DOMContentLoaded', async function() {
         questionElements = document.querySelectorAll('.question-block');
         mapItemElements = document.querySelectorAll('#questionMapContainer button');
     }
+    
+    // ---- FUNGSI MEMUAT PROGRES ----
+    function loadProgress() {
+        const savedStep = loadData('dass-step');
+        const userData = loadData('dass-user-data');
+        const savedAnswers = loadData('dass-answers');
+        const savedIndex = loadData('dass-current-index');
+        const savedTestType = loadData('dass-test-type');
+        document.getElementById("icon-person").classList.add("hidden");
+        document.getElementById("icon-person").classList.remove("md:block");
+        if (userData) {
+            document.getElementById('employeeName').value = userData.employeeName || '';
+            document.getElementById('employeeId').value = userData.employeeId || '';
+            departmentSelect.value = userData.department || '';
+            document.getElementById('age').value = userData.age || '';
+            unitSelect.value = userData.unit || '';
+            tingkatSelect.value = userData.tingkat || '';
+        }
 
-    // ---- BAGIAN UTAMA DENGAN LINK BARU ----
+        if (savedStep === 'kuesioner' && savedTestType) {
+            selectedTestType = savedTestType;
+            prepareAndStartQuiz(savedAnswers, savedIndex);
+            
+        } else if (savedStep === 'testSelection') {
+            landingPageStep.classList.add('hidden');
+            dataDiriStep.classList.add('hidden');
+            testSelectionStep.classList.remove('hidden');
+            document.body.style.backgroundImage = "url('./asset/3background.svg')";
+            // document.getElementById("icon-person").classList.add("hidden");
+            // document.getElementById("icon-person").classList.remove("md:block");
+
+        } else if (savedStep === 'dataDiri') {
+            landingPageStep.classList.add('hidden');
+            dataDiriStep.classList.remove('hidden');
+            document.body.style.backgroundImage = "url('./asset/3background.svg')";
+            // document.getElementById("icon-person").classList.add("hidden");
+        }
+    }
+
+    // ---- FUNGSI BARU: MENYIAPKAN SOAL DAN MEMULAI KUIS ----
+    function prepareAndStartQuiz(savedAnswers = null, savedIndex = null) {
+        // Jika DASS-21, ambil soal dengan index genap (soal ke 1, 3, 5, ...)
+        if (selectedTestType === 'DASS-21') {
+            questions = allQuestions.filter((_, index) => index % 2 === 0);
+        } else {
+            questions = allQuestions;
+        }
+        
+        initializeQuiz();
+
+        landingPageStep.classList.add('hidden');
+        dataDiriStep.classList.add('hidden');
+        testSelectionStep.classList.add('hidden');
+        instruksiStep.classList.add('hidden');
+        kuesionerStep.classList.remove('hidden');
+        document.body.style.backgroundImage = "url('./asset/3background.svg')";
+        document.getElementById("icon-person").classList.add("hidden");
+
+        if (savedAnswers) {
+            Object.keys(savedAnswers).forEach(qName => {
+                const value = savedAnswers[qName];
+                const radio = document.querySelector(`input[name="${qName}"][value="${value}"]`);
+                if (radio) radio.checked = true;
+            });
+        }
+        
+        currentQuestionIndex = savedIndex !== null ? savedIndex : 0;
+        showQuestion(currentQuestionIndex);
+    }
+
+    // ---- BAGIAN UTAMA (DIPERBARUI) ----
     async function initializeApp() {
-        // --- GANTI LINK DI BAWAH INI ---
         const googleSheetQuestionsURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRA1o8wzpNdcfFZSBKxbkToTBjvDvHfCJ58hXMCO_aEAOeYjfGGXf7tfkDxwIL4qzoFqGgDSeAkcPvR/pub?gid=1682628887&single=true&output=csv';
         const googleSheetBagianURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBK0QHLv0BTPBgyeJ9Wg3yCU6M55mA3PLJVOHe2pq8vSe_sHfPjZTssF6lTgWiyAgDqwU7Ywjzwyat/pub?gid=0&single=true&output=csv';
         const googleSheetUnitURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBK0QHLv0BTPBgyeJ9Wg3yCU6M55mA3PLJVOHe2pq8vSe_sHfPjZTssF6lTgWiyAgDqwU7Ywjzwyat/pub?gid=1872872817&single=true&output=csv';
@@ -137,21 +209,42 @@ document.addEventListener('DOMContentLoaded', async function() {
             fetchDropdownData(googleSheetUnitURL),
             fetchDropdownData(googleSheetTingkatURL)
         ]);
+        
+        allQuestions = questionData; // Simpan semua soal
 
-        // Inisialisasi soal kuis
-        questions = questionData;
-        initializeQuiz();
-
-        // Isi dropdown
         populateDropdown(departmentSelect, bagianData, 'Silahkan pilih bagian anda');
         populateDropdown(unitSelect, unitData, 'Silahkan pilih unit anda');
         populateDropdown(tingkatSelect, tingkatData, 'Silahkan pilih tingkatan anda');
+        
+        loadProgress();
     }
     
-    initializeApp(); // Jalankan fungsi utama
+    initializeApp();
 
-    // ---- SISA SCRIPT (LOGIKA NAVIGASI DAN SUBMIT) ----
-    // ... (Tidak ada perubahan dari sini ke bawah, cukup salin semua sisa kode dari file asli Anda) ...
+    // ... (Fungsi updateQuestionMap dan showQuestion tetap sama) ...
+    function showQuestion(index) {
+        if(questionElements.length === 0) return;
+        questionElements.forEach((el, i) => {
+            el.classList.toggle('hidden', i !== index);
+        });
+        
+        const currentQuestionEl = questionElements[index];
+        if (currentQuestionEl) {
+             questionsContainer.style.height = `${currentQuestionEl.offsetHeight}px`;
+        }
+        
+        const totalQuestionSpan = document.querySelector('#kuesionerStep .font-medium');
+        if(totalQuestionSpan && questions.length > 0) {
+            totalQuestionSpan.innerHTML = `Pertanyaan <span id="questionCounter" class="font-bold">${index + 1}</span> dari ${questions.length}`;
+        }
+
+        prevButton.disabled = index === 0;
+        nextButton.classList.toggle('hidden', index === questionElements.length - 1);
+        submitButton.classList.toggle('hidden', index !== questionElements.length - 1);
+        updateQuestionMap();
+        
+        saveData('dass-current-index', index);
+    }
     function updateQuestionMap() {
         const formData = new FormData(dassForm);
         mapItemElements.forEach((item, index) => {
@@ -171,36 +264,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
-    function showQuestion(index) {
-        if(questionElements.length === 0) return;
-        questionElements.forEach((el, i) => {
-            el.classList.toggle('hidden', i !== index);
-        });
-        
-        const currentQuestionEl = questionElements[index];
-        if (currentQuestionEl) {
-             questionsContainer.style.height = `${currentQuestionEl.offsetHeight}px`;
-        }
-        
-        const questionCounterEl = document.getElementById('questionCounter');
-        if(questionCounterEl) questionCounterEl.textContent = index + 1;
-        
-        const totalQuestionSpan = document.querySelector('#kuesionerStep .font-medium');
-        if(totalQuestionSpan && questions.length > 0) {
-            totalQuestionSpan.innerHTML = `Pertanyaan <span id="questionCounter" class="font-bold">${index + 1}</span> dari ${questions.length}`;
-        }
+    // ---- EVENT LISTENERS ----
 
-        prevButton.disabled = index === 0;
-        nextButton.classList.toggle('hidden', index === questionElements.length - 1);
-        submitButton.classList.toggle('hidden', index !== questionElements.length - 1);
-        updateQuestionMap();
-    }
-    
     openNowButton.addEventListener('click', () => {
         landingPageStep.classList.add('hidden');
         dataDiriStep.classList.remove('hidden');
         document.body.style.backgroundImage = "url('./asset/3background.svg')";
-        document.getElementById("icon-person").classList.remove("md:block");
+        document.getElementById("icon-person").classList.add('hidden');
+        saveData('dass-step', 'dataDiri');
     });
 
     closeModalButton.addEventListener('click', () => alertModal.classList.add('hidden'));
@@ -209,27 +280,55 @@ document.addEventListener('DOMContentLoaded', async function() {
         const employeeName = document.getElementById('employeeName').value;
         const employeeId = document.getElementById('employeeId').value;
         const department = document.getElementById('department').value;
-        const age = document.getElementById('age').value;
+        const ageInput = document.getElementById('age').value;
         const unit = document.getElementById('unit').value;
         const tingkat = document.getElementById('tingkat').value;
+        document.getElementById("icon-person").classList.add("hidden");
+        document.getElementById("icon-person").classList.remove("md:block");
 
-        if (!employeeName || !employeeId || !department || !age || !unit || !tingkat) {
+        if (!employeeName || !employeeId || !department || !ageInput || !unit || !tingkat) {
             alertMessage.textContent = 'Pastikan semua data diri terisi.';
             unansweredList.innerHTML = '';
             alertModal.classList.remove('hidden');
             return;
         }
+        
+        const age = parseInt(ageInput, 10);
+        if (isNaN(age) || age < 18 || age > 70) {
+            alertMessage.textContent = 'Usia harus diisi dengan angka antara 18 dan 70.';
+            unansweredList.innerHTML = '';
+            alertModal.classList.remove('hidden');
+            return;
+        }
 
+        saveData('dass-user-data', { employeeName, employeeId, department, age, unit, tingkat });
+        
         dataDiriStep.classList.add('hidden');
+        testSelectionStep.classList.remove('hidden');
+        
+        saveData('dass-step', 'testSelection');
+    });
+
+    dass42Button.addEventListener('click', () => {
+        selectedTestType = 'DASS-42';
+        saveData('dass-test-type', selectedTestType);
+        testSelectionStep.classList.add('hidden');
+        instruksiStep.classList.remove('hidden');
+    });
+    
+    dass21Button.addEventListener('click', () => {
+        selectedTestType = 'DASS-21';
+        saveData('dass-test-type', selectedTestType);
+        testSelectionStep.classList.add('hidden');
         instruksiStep.classList.remove('hidden');
     });
     
     lanjutKeSoalButton.addEventListener('click', function() {
-        instruksiStep.classList.add('hidden');
-        kuesionerStep.classList.remove('hidden');
-        showQuestion(0);
+        saveData('dass-step', 'kuesioner');
+        prepareAndStartQuiz();
     });
 
+    // ... (Sisa event listener untuk navigasi, map, dan change tetap sama) ...
     questionMapContainer.addEventListener('click', (e) => {
         if (e.target.tagName === 'BUTTON') {
             const index = parseInt(e.target.dataset.index, 10);
@@ -240,6 +339,16 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     questionsContainer.addEventListener('change', () => {
         updateQuestionMap();
+        
+        const formData = new FormData(dassForm);
+        const answers = {};
+        for (let i = 1; i <= questions.length; i++) {
+            if (formData.has(`q${i}`)) {
+                answers[`q${i}`] = formData.get(`q${i}`);
+            }
+        }
+        saveData('dass-answers', answers);
+        
         setTimeout(() => {
             if (currentQuestionIndex < questions.length - 1) {
                 currentQuestionIndex++;
@@ -262,170 +371,96 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 
-    // dassForm.addEventListener('submit', function(e) {
-    //     e.preventDefault();
-        
-    //     const formData = new FormData(dassForm);
-        
-    //     let unansweredQuestions = [];
-    //     for (let i = 1; i <= questions.length; i++) {
-    //         if (!formData.has(`q${i}`)) {
-    //             unansweredQuestions.push(i);
-    //         }
-    //     }
 
-    //     if (unansweredQuestions.length > 0) {
-    //         alertMessage.textContent = 'Harap jawab semua pertanyaan. Pertanyaan berikut belum dijawab:';
-    //         unansweredList.innerHTML = '';
-    //         unansweredQuestions.forEach(qNum => {
-    //             const li = document.createElement('li');
-    //             li.textContent = `Nomor ${qNum}`;
-    //             unansweredList.appendChild(li);
-    //         });
-    //         alertModal.classList.remove('hidden');
-    //         return;
-    //     }
-
-    //     let scores = { D: 0, A: 0, S: 0 };
-    //     for (let i = 0; i < questions.length; i++) {
-    //         const questionNumber = i + 1;
-    //         const type = questions[i].type;
-    //         const value = parseInt(formData.get(`q${questionNumber}`), 10);
-    //         if (scores[type] !== undefined) {
-    //             scores[type] += value;
-    //         }
-    //     }
-
-    //     const finalScores = { D: scores.D, A: scores.A, S: scores.S };
-    //     const levels = {
-    //         D: getDepressionLevel(finalScores.D),
-    //         A: getAnxietyLevel(finalScores.A),
-    //         S: getStressLevel(finalScores.S)
-    //     };
-
-    //     kuesionerStep.classList.add('hidden');
-    //     endpage.classList.remove('hidden');
-    //     window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-    //     // exportData = [{
-    //     //     'Nama Karyawan': formData.get('employeeName'), 
-    //     //     'ID Karyawan': formData.get('employeeId'), 
-    //     //     'Departemen': formData.get('department'),
-    //     //     'Unit': formData.get('unit'),
-    //     //     'Tingkat': formData.get('tingkat'),
-    //     //     'Usia': formData.get('age'),
-    //     //     'Skor Depresi': finalScores.D, 'Tingkat Depresi': levels.D,
-    //     //     'Skor Kecemasan': finalScores.A, 'Tingkat Kecemasan': levels.A,
-    //     //     'Skor Stres': finalScores.S, 'Tingkat Stres': levels.S,
-    //     //     'Tanggal': new Date().toLocaleDateString('id-ID')
-    //     // }];
-        
-    //     // Menambahkan tombol export di halaman akhir
-    //     // const exportButtonEndPage = document.createElement('button');
-    //     // exportButtonEndPage.id = 'exportButton';
-    //     // exportButtonEndPage.textContent = 'Export ke Excel';
-    //     // exportButtonEndPage.className = 'bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-transform transform hover:scale-105 mt-8';
-        
-    //     // exportButtonEndPage.addEventListener('click', function() {
-    //     //     if(exportData.length === 0) return;
-    //     //     const worksheet = XLSX.utils.json_to_sheet(exportData);
-    //     //     const workbook = XLSX.utils.book_new();
-    //     //     XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil DASS");
-    //     //     const employeeName = exportData[0]['Nama Karyawan'].replace(/\s+/g, '_');
-    //     //     const today = new Date().toISOString().slice(0, 10);
-    //     //     XLSX.writeFile(workbook, `Hasil_DASS42_${employeeName}_${today}.xlsx`);
-    //     // });
-        
-    //     endpage.querySelector('.w-full.md\\:w-2\\/3.z-20').appendChild(exportButtonEndPage);
-    // });
-
+    // ---- EVENT SUBMIT FORM (DIPERBARUI) ----
     dassForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(dassForm);
-    
-    let unansweredQuestions = [];
-    for (let i = 1; i <= questions.length; i++) {
-        if (!formData.has(`q${i}`)) {
-            unansweredQuestions.push(i);
-        }
-    }
-
-    if (unansweredQuestions.length > 0) {
-        alertMessage.textContent = 'Harap jawab semua pertanyaan. Pertanyaan berikut belum dijawab:';
-        unansweredList.innerHTML = '';
-        unansweredQuestions.forEach(qNum => {
-            const li = document.createElement('li');
-            li.textContent = `Nomor ${qNum}`;
-            unansweredList.appendChild(li);
-        });
-        alertModal.classList.remove('hidden');
-        return;
-    }
-
-    let scores = { D: 0, A: 0, S: 0 };
-    for (let i = 0; i < questions.length; i++) {
-        const questionNumber = i + 1;
-        const type = questions[i].type;
-        const value = parseInt(formData.get(`q${questionNumber}`), 10);
-        if (scores[type] !== undefined) {
-            scores[type] += value;
-        }
-    }
-
-    const finalScores = { D: scores.D, A: scores.A, S: scores.S };
-    const levels = {
-        D: getDepressionLevel(finalScores.D),
-        A: getAnxietyLevel(finalScores.A),
-        S: getStressLevel(finalScores.S)
-    };
-
-    // --- MULAI MODIFIKASI: Mengirim data ke Google Spreadsheet ---
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyxQ6qvP7HUNsCUdvJoiZj7Km5niMJVagB23TVMz3voJdjCeTrzjwT8VDST01wxGllu/exec';
-    
-    // Membuat objek URLSearchParams untuk membangun query string
-    const params = new URLSearchParams({
-        action: 'dass',
-        namaKaryawan: formData.get('employeeName'),
-        nikSAP: formData.get('employeeId'),
-        bagian: formData.get('department'),
-        usia: formData.get('age'),
-        unit: formData.get('unit'),
-        tingkat: formData.get('tingkat'),
-        skorD: finalScores.D,
-        tingkatD: levels.D,
-        skorC: finalScores.A, // 'A' untuk Anxiety (Kecemasan)
-        tingkatC: levels.A,
-        skorS: finalScores.S,
-        tingkatS: levels.S
-    });
-
-    // Mengirim data menggunakan Fetch API (metode GET)
-    fetch(`${scriptURL}?${params.toString()}`)
-        .then(response => {
-            if (response.ok) {
-                console.log('Data berhasil terkirim ke Spreadsheet.');
-            } else {
-                // Jika terjadi error dari sisi server (misal: script error)
-                console.error('Gagal mengirim data. Status:', response.status);
+        e.preventDefault();
+        
+        const formData = new FormData(dassForm);
+        
+        let unansweredQuestions = [];
+        for (let i = 1; i <= questions.length; i++) {
+            if (!formData.has(`q${i}`)) {
+                unansweredQuestions.push(i);
             }
-        })
-        .catch(error => {
-            // Jika terjadi error jaringan (misal: tidak ada internet)
-            console.error('Error saat mengirim data:', error.message);
-            alert('Terjadi kesalahan jaringan. Gagal mengirim data ke server.');
-        });
-    // --- AKHIR MODIFIKASI ---
+        }
 
-    kuesionerStep.classList.add('hidden');
-    endpage.classList.remove('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Bagian kode untuk export ke Excel tidak diubah dan tetap dalam komentar
-    // exportData = [...]
-    // endpage.querySelector(...).appendChild(exportButtonEndPage);
+        if (unansweredQuestions.length > 0) {
+            alertMessage.textContent = 'Harap jawab semua pertanyaan. Pertanyaan berikut belum dijawab:';
+            unansweredList.innerHTML = '';
+            unansweredQuestions.forEach(qNum => {
+                const li = document.createElement('li');
+                li.textContent = `Nomor ${qNum}`;
+                unansweredList.appendChild(li);
+            });
+            alertModal.classList.remove('hidden');
+            return;
+        }
+
+        let scores = { D: 0, A: 0, S: 0 };
+        for (let i = 0; i < questions.length; i++) {
+            const questionNumber = i + 1;
+            const type = questions[i].type;
+            const value = parseInt(formData.get(`q${questionNumber}`), 10);
+            if (scores[type] !== undefined) {
+                scores[type] += value;
+            }
+        }
+
+        // ---- MODIFIKASI: Kalikan 2 jika DASS-21 ----
+        if (selectedTestType === 'DASS-21') {
+            scores.D *= 2;
+            scores.A *= 2;
+            scores.S *= 2;
+        }
+
+        const finalScores = { D: scores.D, A: scores.A, S: scores.S };
+        const levels = {
+            D: getDepressionLevel(finalScores.D),
+            A: getAnxietyLevel(finalScores.A),
+            S: getStressLevel(finalScores.S)
+        };
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyxQ6qvP7HUNsCUdvJoiZj7Km5niMJVagB23TVMz3voJdjCeTrzjwT8VDST01wxGllu/exec';
+        
+        const params = new URLSearchParams({
+            action: 'dass',
+            namaKaryawan: formData.get('employeeName'),
+            nikSAP: formData.get('employeeId'),
+            bagian: formData.get('department'),
+            usia: formData.get('age'),
+            unit: formData.get('unit'),
+            tingkat: formData.get('tingkat'),
+            skorD: finalScores.D,
+            tingkatD: levels.D,
+            skorC: finalScores.A,
+            tingkatC: levels.A,
+            skorS: finalScores.S,
+            tingkatS: levels.S,
+            jenisTest: selectedTestType
+        });
+
+        fetch(`${scriptURL}?${params.toString()}`)
+            .then(response => {
+                if (response.ok) {
+                    console.log('Data berhasil terkirim ke Spreadsheet.');
+                } else {
+                    console.error('Gagal mengirim data. Status:', response.status);
+                }
+            })
+            .catch(error => {
+                console.error('Error saat mengirim data:', error.message);
+                alert('Terjadi kesalahan jaringan. Gagal mengirim data ke server.');
+            });
+
+        kuesionerStep.classList.add('hidden');
+        endpage.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        clearData();
     });
 
+    // ... (Fungsi getDepressionLevel, getAnxietyLevel, getStressLevel tetap sama) ...
     function getDepressionLevel(score) {
         if (score <= 9) return 'Normal'; if (score <= 13) return 'Ringan'; if (score <= 20) return 'Sedang'; if (score <= 27) return 'Parah'; return 'Sangat Parah';
     }
